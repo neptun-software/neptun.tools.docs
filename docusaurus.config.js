@@ -3,17 +3,18 @@
 // (when paired with `@ts-check`).
 // There are various equivalent ways to declare your Docusaurus config.
 // See: https://docusaurus.io/docs/api/docusaurus-config
+// https://npmtrends.com/docusaurus-vs-vitepress-vs-vuepress
 
 import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Neptun',
-  tagline: 'CICD configs with ease using AI. No entry barrier. CICD for everyone.',
-  favicon: 'https://avatars.githubusercontent.com/u/159569401?s=400&u=0a09dd65d019b52d0ba238b71b9566c5c4619161&v=4',
+  tagline: 'Automated Tech Stack Configuration powered by AI.',
+  favicon: 'img/favicon.png',
 
   // Set the production url of your site here
-  url: 'https://neptun-ai-models.pages.dev',
+  url: 'https://neptun-ai-tools-docs.pages.dev',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -43,8 +44,7 @@ const config = {
           sidebarPath: './sidebars.js',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/neptun-software/neptun-ai-tools-docs',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -57,22 +57,22 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'https://avatars.githubusercontent.com/u/159569401?s=400&u=0a09dd65d019b52d0ba238b71b9566c5c4619161&v=4',
+      image: 'img/favicon.png',
       navbar: {
         title: 'Neptun',
         logo: {
           alt: 'Neptun Logo',
-          src: 'https://avatars.githubusercontent.com/u/159569401?s=400&u=0a09dd65d019b52d0ba238b71b9566c5c4619161&v=4'
+          src: 'img/logo.png'
         },
         items: [
           {
             type: 'docSidebar',
             sidebarId: 'modelsSidebar',
             position: 'left',
-            label: 'Models'
+            label: 'Docs'
           },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/neptun-software',
             label: 'GitHub',
             position: 'right'
           }

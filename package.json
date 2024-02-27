@@ -1,8 +1,9 @@
 {
-  "name": "neptun-ai-models",
+  "name": "neptun-ai-tools-docs",
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "dev": "npm run start",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",

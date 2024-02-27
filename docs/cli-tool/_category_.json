@@ -1,0 +1,8 @@
+{
+  "label": "CLI-Tool",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "NeptunAI can be used with our CLI tool, which is available on npm and apt."
+  }
+}
