@@ -32,7 +32,7 @@ const config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'de'],
   },
 
   presets: [
@@ -85,7 +85,10 @@ const config = {
             href: 'https://github.com/neptun-software',
             label: 'GitHub',
             position: 'right'
-          }
+          },
+          {
+            type: 'localeDropdown',
+          },
         ]
       },
       footer: {
@@ -95,8 +98,18 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula
+      },
+      zoom: {
+        selector: 'img',
+        config: {
+          scrollOffset: 100
+        }
       }
-    })
+    }),
+
+    plugins: [
+      require.resolve("docusaurus-plugin-image-zoom") // TODO: implement own image zoom, because this one sucks
+    ]
 };
 
 export default config;
