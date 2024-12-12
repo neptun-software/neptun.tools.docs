@@ -2,16 +2,16 @@
 sidebar_position: 1
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # ERD
 
 :::info
 
-This is how the Neptun database looks like.  
-We use drizzle as our ORM. The table `__drizzle_migrations` stores our migrations.  
-We use NeonDB as SaaS, because it is free and easy to use, and this project doesn't make us any money.
+So sieht die Neptun-Datenbank aus.
+Wir verwenden Drizzle als ORM. Die Tabelle `\_\_drizzle_migrations` speichert unsere Migrationen.
+Wir verwenden NeonDB als SaaS, weil es kostenlos und einfach zu nutzen ist, und weil wir mit diesem Projekt kein Geld verdienen.
 
 :::
 
@@ -175,7 +175,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';

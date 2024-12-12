@@ -108,7 +108,61 @@ const config = {
     }),
 
     plugins: [
-      require.resolve("docusaurus-plugin-image-zoom") // TODO: implement own image zoom, because this one sucks
+      require.resolve("docusaurus-plugin-image-zoom"), // TODO: implement own image zoom, because this one sucks
+      [
+        'docusaurus-plugin-remote-content',
+        {
+          name: 'neptun-web-docs',
+          sourceBaseUrl: 'https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/public/docs',
+          documents: [
+            'api_ai_huggingface_chat.md',
+            'api_auth_check.md',
+            'api_auth_login.md',
+            'api_auth_logout.md',
+            'api_auth_sign-up.md',
+            'api_html-to-markdown.md',
+            'api_shared_chats.md',
+            'api_users_chats_delete.md',
+            'api_users_chats_files_create.md',
+            'api_users_chats_files.md',
+            'api_users_chats_messages_create.md',
+            'api_users_chats_messages_last_delete.md',
+            'api_users_chats_messages.md',
+            'api_users_chats_shares_create.md',
+            'api_users_chats_shares_whitelist_entries_create.md',
+            'api_users_chats_shares.md',
+            'api_users_chats_update.md',
+            'api_users_chats.md',
+            'api_users_cli.md',
+            'api_users_delete.md',
+            'api_users_installations_imports.md',
+            'api_users_installations.md',
+            'api_users_update.md',
+            'auth_otp.md',
+            'email_reset-password.md',
+            'health.md',
+          ],
+          outDir: 'docs/web-interface/api',
+          modifyContent(_filename, content) {
+            const codeBlocks = [];
+            let modifiedContent = content.replace(/```[\s\S]*?```/g, match => {
+              codeBlocks.push(match);
+              return '###CODE_BLOCK###';
+            });
+            
+            // replace all {token} with [token], because the markdown parser does see them as 
+            // template literals which causes `token is not defined`, for example in the 
+            // "Huggingface Chat Endpoint" and in the "Shared Chat Messages Endpoint"
+            modifiedContent = modifiedContent.replace(/{([^}]*)}/g, '[$1]');
+            
+            codeBlocks.forEach(block => {
+              modifiedContent = modifiedContent.replace('###CODE_BLOCK###', block);
+            });
+            
+            return { content: modifiedContent };
+          }
+        }
+      ]
     ]
 };
 

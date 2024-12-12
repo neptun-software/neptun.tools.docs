@@ -1,6 +1,6 @@
 {
   "label": "Web-Interface",
-  "position": 3,
+  "position": 2,
   "link": {
     "type": "generated-index",
     "description": "NeptunAI can be used through our web interface as a SaaS (Software as a Service), but you also have the option to host it yourself."
