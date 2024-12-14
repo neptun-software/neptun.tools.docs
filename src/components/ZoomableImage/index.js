@@ -1,15 +1,24 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './styles.module.css';
 
 export default function ZoomableImage({ src, alt }) {
   const [isZoomed, setIsZoomed] = useState(false);
   const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const positionRef = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
   const [hasMoved, setHasMoved] = useState(false);
+  const frameRef = useRef();
+  const imageRef = useRef(null);
 
   const imageSrc = src;
+
+  const updateTransform = useCallback(() => {
+    if (imageRef.current) {
+      const transform = `translate3d(calc(-50% + ${positionRef.current.x}px), calc(-50% + ${positionRef.current.y}px), 0) scale(${scale})`;
+      imageRef.current.style.transform = transform;
+    }
+  }, [scale]);
 
   const handleZoom = useCallback((delta) => {
     setScale(prevScale => {
@@ -17,6 +26,10 @@ export default function ZoomableImage({ src, alt }) {
       return Math.min(Math.max(0.5, newScale), 3);
     });
   }, []);
+
+  useEffect(() => {
+    updateTransform();
+  }, [scale, updateTransform]);
 
   const handleWheel = useCallback((e) => {
     if (e.ctrlKey) {
@@ -26,38 +39,51 @@ export default function ZoomableImage({ src, alt }) {
     }
   }, [handleZoom]);
 
+  const updatePosition = useCallback(() => {
+    if (isDraggingRef.current) {
+      updateTransform();
+      frameRef.current = requestAnimationFrame(updatePosition);
+    }
+  }, [updateTransform]);
+
   const handleMouseDown = useCallback((e) => {
     if (isZoomed) {
       e.preventDefault();
-      setIsDragging(true);
+      isDraggingRef.current = true;
       setHasMoved(false);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
+      dragStartRef.current = {
+        x: e.clientX - positionRef.current.x,
+        y: e.clientY - positionRef.current.y
+      };
+      frameRef.current = requestAnimationFrame(updatePosition);
     }
-  }, [isZoomed, position]);
+  }, [isZoomed, updatePosition]);
 
   const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
+    if (isDraggingRef.current) {
+      e.preventDefault();
       setHasMoved(true);
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
+      positionRef.current = {
+        x: e.clientX - dragStartRef.current.x,
+        y: e.clientY - dragStartRef.current.y
+      };
     }
-  }, [isDragging, dragStart]);
+  }, []);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
+    if (frameRef.current) {
+      cancelAnimationFrame(frameRef.current);
+    }
   }, []);
 
   const handleClick = useCallback(() => {
     if (!hasMoved) {
       setIsZoomed(!isZoomed);
-      if (!isZoomed) {
-        setScale(1);
-        setPosition({ x: 0, y: 0 });
+      setScale(1);
+      positionRef.current = { x: 0, y: 0 };
+      if (imageRef.current) {
+        imageRef.current.style.transform = 'translate3d(-50%, -50%, 0) scale(1)';
       }
     }
   }, [hasMoved, isZoomed]);
@@ -66,13 +92,17 @@ export default function ZoomableImage({ src, alt }) {
     e.stopPropagation();
     setIsZoomed(false);
     setScale(1);
-    setPosition({ x: 0, y: 0 });
+    positionRef.current = { x: 0, y: 0 };
+    setHasMoved(false);
+    if (imageRef.current) {
+      imageRef.current.style.transform = 'translate3d(-50%, -50%, 0) scale(1)';
+    }
   }, []);
 
   useEffect(() => {
     if (isZoomed) {
       document.addEventListener('wheel', handleWheel, { passive: false });
-      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mousemove', handleMouseMove, { passive: false });
       document.addEventListener('mouseup', handleMouseUp);
     }
 
@@ -80,6 +110,9 @@ export default function ZoomableImage({ src, alt }) {
       document.removeEventListener('wheel', handleWheel);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
     };
   }, [isZoomed, handleWheel, handleMouseMove, handleMouseUp]);
 
@@ -96,17 +129,19 @@ export default function ZoomableImage({ src, alt }) {
         <div className={styles.lightbox} onClick={handleClick}>
           <button className={styles.closeButton} onClick={handleClose}>×</button>
           <img
+            ref={imageRef}
             src={imageSrc}
             alt={alt}
             style={{
-              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`
+              transform: 'translate3d(-50%, -50%, 0) scale(1)',
+              willChange: 'transform'
             }}
             onMouseDown={handleMouseDown}
             draggable={false}
           />
           <div className={styles.zoomControls}>
             <button onClick={(e) => { e.stopPropagation(); handleZoom(1); }}>+</button>
-            <button onClick={(e) => { e.stopPropagation(); handleZoom(-1); }}>-</button>
+            <button onClick={(e) => { e.stopPropagation(); handleZoom(-1); }}>−</button>
           </div>
         </div>
       )}
