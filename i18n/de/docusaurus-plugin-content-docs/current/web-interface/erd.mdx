@@ -2,8 +2,10 @@
 sidebar_position: 1
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import ZoomableImage from '@site/src/components/ZoomableImage';
+import erdImage from './img/ERD-2024-12-09T18-48-00-180Z.png';
 
 # ERD
 
@@ -133,9 +135,7 @@ erDiagram
 
   </TabItem>
   <TabItem value="png" label="PNG">
-
-![ERD](./img/ERD-2024-12-09T18-48-00-180Z.png)
-
+    <ZoomableImage src={erdImage} alt="ERD" />
   </TabItem>
   <TabItem value="sql" label="SQL">
 
@@ -175,7 +175,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';

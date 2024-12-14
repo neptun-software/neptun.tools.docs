@@ -13,23 +13,19 @@ const config = {
   tagline: "Automated Tech Stack Configuration powered by AI.",
   favicon: "img/favicon.png",
 
-  // Set the production url of your site here
+  // The production url of the site
   url: "https://neptun-ai-tools-docs.pages.dev",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
 
   // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: "neptun", // Usually your GitHub org/user name.
-  projectName: "neptun-docker-cicd", // Usually your repo name.
+  organizationName: "neptun",
+  projectName: "neptun.tools.docs",
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "en",
     locales: ["en", "de"],
@@ -42,6 +38,7 @@ const config = {
       ({
         docs: {
           sidebarPath: "./sidebars.js",
+          /* docItemComponent: "@theme/ApiItem", */
           editUrl: ({ docPath }) => {
             if (docPath.startsWith("web-interface/api/")) {
               return (
@@ -55,6 +52,18 @@ const config = {
             );
           },
         },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.5,
+          ignorePatterns: ['/tags/**'],
+          filename: 'sitemap.xml',
+          createSitemapItems: async (params) => {
+            const {defaultCreateSitemapItems, ...rest} = params;
+            const items = await defaultCreateSitemapItems(rest);
+            return items.filter((item) => !item.url.includes('/page/'));
+          },
+        },
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -62,7 +71,7 @@ const config = {
     ],
   ],
 
-  themes: ["@docusaurus/theme-mermaid"],
+  themes: ["@docusaurus/theme-mermaid"/* , "docusaurus-theme-openapi-docs" */],
   markdown: {
     mermaid: true,
   },
@@ -70,7 +79,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
       image: "img/favicon.png",
       colorMode: {
         defaultMode: "light",
@@ -112,6 +120,8 @@ const config = {
     }),
 
   plugins: [
+    require.resolve('docusaurus-lunr-search'),
+    'docusaurus-plugin-sass',
     [
       "docusaurus-plugin-remote-content",
       {
@@ -170,6 +180,26 @@ const config = {
         },
       },
     ],
+    // openapi.json would need summary and operationId for this to work (waiting for nitro update...)
+    // [
+    //   'docusaurus-plugin-openapi-docs',
+    //   {
+    //     id: "openapi",
+    //     docsPluginId: "classic",
+    //     config: {
+    //       /** @type {import('docusaurus-plugin-openapi-docs').Options} */
+    //       neptun: {
+    //         specPath: "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/public/docs/openapi.json",
+    //         downloadUrl: "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/public/docs/openapi.json",
+    //         outputDir: "docs/openapi",
+    //         sidebarOptions: {
+    //           groupPathsBy: "tag",
+    //         },
+    //         showSchemas: true,
+    //       },
+    //     }
+    //   },
+    // ]
   ],
 };
 
