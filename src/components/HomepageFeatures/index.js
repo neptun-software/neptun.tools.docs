@@ -1,33 +1,48 @@
-import clsx from 'clsx';
-import Heading from '@theme/Heading';
-import styles from './styles.module.css';
+import clsx from "clsx";
+import Heading from "@theme/Heading";
+import styles from "./styles.module.css";
 
 const FeatureList = [
   {
-    title: 'Web Interface',
-    Svg: require('@site/static/img/banner.svg').default,
+    title: "Web Interface",
+    image: {
+      /* svg: require('@site/static/img/banner.svg').default, */
+      png: require("@site/static/img/logo-web-banner.png").default,
+    },
     description: (
       <>
-        NeptunAI can be used through our web interface as a SaaS (Software as a Service), but you also have the option to host it yourself.
+        NeptunAI kann über unsere Web-Schnittstelle als SaaS (Software as a
+        Service) genutzt werden. Self-hosting ist ebenfalls möglich.
       </>
     ),
   },
   {
-    title: 'CLI Tool',
-    Svg: require('@site/static/img/banner.svg').default,
+    title: "CLI Tool",
+    image: {
+      /* svg: require('@site/static/img/banner.svg').default, */
+      png: require("@site/static/img/logo-cli-banner.png").default,
+    },
     description: (
       <>
-        NeptunAI can be used with our CLI tool, which is available on npm and apt.
+        NeptunAI kann mit unserem CLI-Tool verwendet werden, das über npm und
+        apt verfügbar ist.
       </>
     ),
   },
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ image, title, description }) {
+  const Svg = image.svg;
+  const imageSrc = image.png;
+
   return (
-    <div className={clsx('col col--6')}>
+    <div className={clsx("col col--6")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        {image.svg ? (
+          <Svg className={styles.featureSvg} role="img" />
+        ) : (
+          <img className={styles.featurePng} src={imageSrc} role="img" />
+        )}
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>

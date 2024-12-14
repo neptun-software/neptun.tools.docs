@@ -42,12 +42,17 @@ const config = {
       ({
         docs: {
           sidebarPath: "./sidebars.js",
-          editUrl: ({docPath}) => {
-            if (docPath.startsWith('web-interface/api/')) {
-              return 'https://github.com/neptun-software/neptun.web/edit/main/public/docs/' + 
-                     docPath.replace('web-interface/api/', '');
+          editUrl: ({ docPath }) => {
+            if (docPath.startsWith("web-interface/api/")) {
+              return (
+                "https://github.com/neptun-software/neptun.web/edit/main/public/docs/" +
+                docPath.replace("web-interface/api/", "")
+              );
             }
-            return 'https://github.com/neptun-software/neptun.tools.docs/edit/main/docs/' + docPath;
+            return (
+              "https://github.com/neptun-software/neptun.tools.docs/edit/main/docs/" +
+              docPath
+            );
           },
         },
         theme: {
@@ -77,6 +82,7 @@ const config = {
         logo: {
           alt: "Neptun Logo",
           src: "img/logo.png",
+          srcDark: "img/logo-light.png",
         },
         items: [
           {
