@@ -109,16 +109,9 @@ const config = {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
-      zoom: {
-        selector: "img",
-        config: {
-          scrollOffset: 100,
-        },
-      },
     }),
 
   plugins: [
-    require.resolve("docusaurus-plugin-image-zoom"), // TODO: implement own image zoom, because this one sucks
     [
       "docusaurus-plugin-remote-content",
       {
