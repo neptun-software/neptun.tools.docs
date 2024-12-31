@@ -10,7 +10,7 @@
   width: 100%;
   height: calc(100vh - 200px);
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   cursor: zoom-in;
   overflow: hidden;

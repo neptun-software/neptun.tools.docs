@@ -53,15 +53,15 @@ const config = {
           },
         },
         sitemap: {
-          lastmod: 'date',
-          changefreq: 'weekly',
+          lastmod: "date",
+          changefreq: "weekly",
           priority: 0.5,
-          ignorePatterns: ['/tags/**'],
-          filename: 'sitemap.xml',
+          ignorePatterns: ["/tags/**"],
+          filename: "sitemap.xml",
           createSitemapItems: async (params) => {
-            const {defaultCreateSitemapItems, ...rest} = params;
+            const { defaultCreateSitemapItems, ...rest } = params;
             const items = await defaultCreateSitemapItems(rest);
-            return items.filter((item) => !item.url.includes('/page/'));
+            return items.filter((item) => !item.url.includes("/page/"));
           },
         },
         theme: {
@@ -71,9 +71,15 @@ const config = {
     ],
   ],
 
-  themes: ["@docusaurus/theme-mermaid"/* , "docusaurus-theme-openapi-docs" */],
+  themes: ["@docusaurus/theme-mermaid"],
   markdown: {
     mermaid: true,
+    format: "mdx",
+    mdx1Compat: {
+      comments: true,
+      admonitions: true,
+      headingIds: true,
+    },
   },
 
   themeConfig:
@@ -116,12 +122,14 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
+        additionalLanguages: ["sql", "mermaid"],
       },
     }),
 
+  // https://github.com/rdilweb/docusaurus-plugin-remote-content/issues/37#issuecomment-1840575140
   plugins: [
-    require.resolve('docusaurus-lunr-search'),
-    'docusaurus-plugin-sass',
+    require.resolve("docusaurus-lunr-search"),
+    "docusaurus-plugin-sass",
     [
       "docusaurus-plugin-remote-content",
       {
@@ -129,32 +137,42 @@ const config = {
         sourceBaseUrl:
           "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/public/docs",
         documents: [
-          "api_ai_huggingface_chat.md",
-          "api_auth_check.md",
-          "api_auth_login.md",
-          "api_auth_logout.md",
-          "api_auth_sign-up.md",
-          "api_html-to-markdown.md",
-          "api_shared_chats.md",
-          "api_users_chats_delete.md",
-          "api_users_chats_files_create.md",
-          "api_users_chats_files.md",
-          "api_users_chats_messages_create.md",
-          "api_users_chats_messages_last_delete.md",
-          "api_users_chats_messages.md",
-          "api_users_chats_shares_create.md",
-          "api_users_chats_shares_whitelist_entries_create.md",
-          "api_users_chats_shares.md",
-          "api_users_chats_update.md",
-          "api_users_chats.md",
-          "api_users_cli.md",
-          "api_users_delete.md",
-          "api_users_installations_imports.md",
-          "api_users_installations.md",
-          "api_users_update.md",
-          "auth_otp.md",
-          "email_reset-password.md",
-          "health.md",
+          "api-ai-huggingface-{model_publisher}-{model_name}-chat.post.md",
+          "api-auth-check.head.md",
+          "api-auth-login.post.md",
+          "api-auth-logout.post.md",
+          "api-auth-sign-up.post.md",
+          "api-html-to-markdown-{url}.get.md",
+          "api-shared-chats-{uuid}.get.md",
+          "api-shared-collections.get.md",
+          "api-shared-collections-{uuid}.get.md",
+          "api-users-{user_id}.delete.md",
+          "api-users-{user_id}.patch.md",
+          "api-users-{user_id}-chats.get.post.delete.md",
+          "api-users-{user_id}-chats-{chat_id}.delete.md",
+          "api-users-{user_id}-chats-{chat_id}.patch.md",
+          "api-users-{user_id}-chats-{chat_id}-files.get.md",
+          "api-users-{user_id}-chats-{chat_id}-files-{message_id}.post.md",
+          "api-users-{user_id}-chats-{chat_id}-messages.get.md",
+          "api-users-{user_id}-chats-{chat_id}-messages.post.md",
+          "api-users-{user_id}-chats-{chat_id}-messages-last.delete.md",
+          "api-users-{user_id}-chats-{chat_id}-shares.get.md",
+          "api-users-{user_id}-chats-{chat_id}-shares.post.md",
+          "api-users-{user_id}-chats-{chat_id}-shares-{share_id}-whitelist-entries.post.md",
+          "api-users-{user_id}-cli.get.md",
+          "api-users-{user_id}-collections.get.md",
+          "api-users-{user_id}-collections.post.md",
+          "api-users-{user_id}-collections-{uuid}.delete.md",
+          "api-users-{user_id}-collections-{uuid}.patch.md",
+          "api-users-{user_id}-collections-{uuid}-templates.post.md",
+          "api-users-{user_id}-collections-{uuid}-templates-{id}.delete.md",
+          "api-users-{user_id}-collections-{uuid}-templates-{id}.get.md",
+          "api-users-{user_id}-collections-{uuid}-templates-{id}.patch.md",
+          "api-users-{user_id}-installations.get.md",
+          "api-users-{user_id}-installations-{installation_id}-imports.get.md",
+          "auth-otp.post.md",
+          "email-{email}-reset-password.post.md",
+          "health.get.md",
         ],
         outDir: "docs/web-interface/api",
         modifyContent(_filename, content) {
@@ -178,6 +196,45 @@ const config = {
 
           return { content: modifiedContent };
         },
+      },
+    ],
+    [
+      "docusaurus-plugin-remote-content",
+      {
+        name: "neptun-web-schema",
+        sourceBaseUrl:
+          "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/backup/schema",
+        documents: ["schema.mermaid", "schema.sql"],
+        outDir: "docs/assets/schema",
+        modifyContent(_filename, content) {
+          if (_filename.endsWith(".mermaid")) {
+            return {
+              filename: "schema.mermaid.md",
+              content: "```mermaid\n" + content + "\n```",
+            };
+          }
+          if (_filename.endsWith(".sql")) {
+            return {
+              filename: "schema.sql.md",
+              content: "```sql\n" + content + "\n```",
+            };
+          }
+
+          return {
+            content,
+          };
+        },
+      },
+    ],
+    [
+      "docusaurus-plugin-remote-content",
+      {
+        name: "neptun-web-schema-image",
+        sourceBaseUrl:
+          "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/backup/schema",
+        documents: ["schema.png"],
+        outDir: "docs/assets/schema",
+        requestConfig: { responseType: "arraybuffer" },
       },
     ],
     // openapi.json would need summary and operationId for this to work (waiting for nitro update...)
