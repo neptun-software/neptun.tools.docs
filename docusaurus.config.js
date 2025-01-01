@@ -205,18 +205,18 @@ const config = {
         sourceBaseUrl:
           "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/backup/schema",
         documents: ["schema.mermaid", "schema.sql"],
-        outDir: "docs/assets/schema",
+        outDir: "docs/assets/_schema",
         modifyContent(_filename, content) {
           if (_filename.endsWith(".mermaid")) {
             return {
               filename: "schema.mermaid.md",
-              content: "```mermaid\n" + content + "\n```",
+              content: "```mermaid\n" + content?.trim() + "\n```",
             };
           }
           if (_filename.endsWith(".sql")) {
             return {
               filename: "schema.sql.md",
-              content: "```sql\n" + content + "\n```",
+              content: "```sql\n" + content?.trim() + "\n```",
             };
           }
 
@@ -233,7 +233,7 @@ const config = {
         sourceBaseUrl:
           "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/backup/schema",
         documents: ["schema.png"],
-        outDir: "docs/assets/schema",
+        outDir: "docs/assets/_schema",
         requestConfig: { responseType: "arraybuffer" },
       },
     ],

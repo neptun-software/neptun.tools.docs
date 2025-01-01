@@ -137,5 +137,4 @@ erDiagram
     neptun_user_template }o--|| neptun_user : "references"
     neptun_user_template }o--|| neptun_user_template_collection : "references"
     neptun_user_template }o--|| neptun_user_file : "references"
-
 ```

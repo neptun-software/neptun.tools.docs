@@ -995,6 +995,4 @@ ALTER DEFAULT PRIVILEGES FOR ROLE cloud_admin IN SCHEMA public GRANT ALL ON TABL
 --
 -- PostgreSQL database dump complete
 --
-
-
 ```
