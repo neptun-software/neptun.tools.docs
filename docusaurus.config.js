@@ -173,6 +173,7 @@ const config = {
           "auth-otp.post.md",
           "email-{email}-reset-password.post.md",
           "health.get.md",
+          "models.md",
         ],
         outDir: "docs/web-interface/api",
         modifyContent(_filename, content) {
