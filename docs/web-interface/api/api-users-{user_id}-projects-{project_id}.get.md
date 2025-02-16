@@ -1,8 +1,8 @@
-# User Template Details Endpoint
+# Get Project Details Endpoint
 
 ## Overview
 
-This endpoint allows users to retrieve details of a specific template within a collection.
+This endpoint allows users to retrieve detailed information about a specific project.
 
 ## Request Details
 
@@ -12,15 +12,14 @@ GET
 
 ### Route
 
-`/api/users/[user_id]/collections/[uuid]/templates/[id]`
+`/api/users/[user_id]/projects/[project_id]`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                           |
+| Parameter  | Type    | Required | Description                      |
+| ---------- | ------- | -------- | -------------------------------- |
+| user_id    | integer | Yes      | The ID of the authenticated user |
+| project_id | integer | Yes      | The ID of the project to fetch   |
 
 ### Headers
 
@@ -33,35 +32,32 @@ GET
 
 No query parameters required.
 
-### Request Body
-
-No request body required.
-
 ## Response Format
 
 ### Response Status Codes
 
 | Status Code | Description                               |
 | ----------- | ----------------------------------------- |
-| 200         | Successfully retrieved template           |
+| 200         | Successfully retrieved project            |
+| 400         | Bad request (invalid parameters)          |
 | 401         | Unauthorized (invalid or missing session) |
 | 403         | Forbidden (user_id mismatch)              |
-| 404         | Template not found                        |
+| 404         | Project not found                         |
 | 500         | Server error                              |
 
 ### Success Response (200 OK)
 
 ```json
 {
-  "template": {
-    "id": 1,
-    "description": "Basic Docker deployment script",
-    "file_name": "docker-deploy.sh",
-    "created_at": "2024-01-01T12:00:00Z",
-    "updated_at": "2024-01-01T12:00:00Z",
-    "neptun_user_id": 1,
-    "template_collection_id": 1,
-    "user_file_id": 1
+  "project": {
+    "id": 123,
+    "name": "My Project",
+    "description": "A description of my project",
+    "project_type": "web-site",
+    "programming_language": "typescript",
+    "created_at": "2025-02-16T17:42:11.000Z",
+    "updated_at": "2025-02-16T17:42:11.000Z",
+    "neptun_user_id": 456
   }
 }
 ```
@@ -71,30 +67,26 @@ No request body required.
 ```json
 {
   "statusCode": 404,
-  "message": "Template not found"
+  "message": "Project not found"
 }
 ```
 
 ### TypeScript Interface
 
 ```typescript
-interface Template {
+interface Project {
   id: number
+  name: string
   description?: string
-  file_name: string
+  project_type: string
+  programming_language: string
   created_at: string
   updated_at: string
   neptun_user_id: number
-  template_collection_id?: number
-  user_file_id?: number
-  title?: string
-  text: string
-  language: string
-  extension: string
 }
 
 interface ApiResponse {
-  template: Template
+  project: Project
 }
 ```
 
@@ -105,22 +97,18 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
-class Template(BaseModel):
+class Project(BaseModel):
     id: int
+    name: str
     description: Optional[str]
-    file_name: str
+    project_type: str
+    programming_language: str
     created_at: datetime
     updated_at: datetime
     neptun_user_id: int
-    template_collection_id: Optional[int]
-    user_file_id: Optional[int]
-    title: Optional[str]
-    text: str
-    language: str
-    extension: str
 
 class ApiResponse(BaseModel):
-    template: Template
+    project: Project
 ```
 
 ## Code Examples
@@ -128,7 +116,7 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X GET "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
+curl "https://neptun-webui.vercel.app/api/users/1/projects/123" \
   -H "Accept: application/json" \
   -H "Cookie: neptun-session=your-session-cookie"
 ```
@@ -137,15 +125,13 @@ curl -X GET "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e2
 
 ```python
 import httpx
-from typing import Optional
 
-async def get_template(
+async def get_project(
     user_id: int,
-    collection_uuid: str,
-    template_id: int,
+    project_id: int,
     session_cookie: str
 ) -> ApiResponse:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/projects/{project_id}"
 
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -162,14 +148,13 @@ async def get_template(
 ### TypeScript/JavaScript Example
 
 ```typescript
-async function getTemplate(
+async function getProject(
   userId: number,
-  collectionUuid: string,
-  templateId: number,
+  projectId: number,
   sessionCookie: string
 ): Promise<ApiResponse> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}/templates/${templateId}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/projects/${projectId}`,
     {
       headers: {
         Accept: 'application/json',
@@ -189,5 +174,6 @@ async function getTemplate(
 ## Notes
 
 - The session cookie is required for authentication
-- The template must belong to the specified collection
-- The collection must belong to the specified user
+- The project must belong to the specified user
+- Both user_id and project_id must be valid positive integers
+- Returns detailed information about a specific project including all its metadata

@@ -12,15 +12,15 @@ PATCH
 
 ### Route
 
-`/api/users/[user_id]/collections/[uuid]/templates/[id]`
+`/api/users/[user_id]/collections/[collection_id]/templates/[template_id]`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
-| id        | integer | Yes      | The ID of the template                           |
+| Parameter     | Type    | Required | Description                       |
+| ------------- | ------- | -------- | --------------------------------- |
+| user_id       | integer | Yes      | The ID of the authenticated user  |
+| collection_id | integer | Yes      | The ID of the template collection |
+| template_id   | integer | Yes      | The ID of the template            |
 
 ### Headers
 
@@ -155,7 +155,7 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000/templates/1" \
+curl -X PATCH "https://neptun-webui.vercel.app/api/users/1/collections/1/templates/1" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -H "Cookie: neptun-session=your-session-cookie" \
@@ -173,13 +173,13 @@ from typing import Optional
 
 async def update_template(
     user_id: int,
-    collection_uuid: str,
+    collection_id: int,
     template_id: int,
     description: Optional[str] = None,
     file_name: Optional[str] = None,
     session_cookie: str = None
 ) -> ApiResponse:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}/templates/{template_id}"
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_id}/templates/{template_id}"
 
     data = {}
     if description is not None:
@@ -206,13 +206,13 @@ async def update_template(
 ```typescript
 async function updateTemplate(
   userId: number,
-  collectionUuid: string,
+  collectionId: number,
   templateId: number,
   data: UpdateTemplateRequest,
   sessionCookie: string
 ): Promise<ApiResponse> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}/templates/${templateId}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionId}/templates/${templateId}`,
     {
       method: 'PATCH',
       headers: {

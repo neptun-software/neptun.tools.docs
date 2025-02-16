@@ -1,8 +1,8 @@
-# User Template Collection Deletion Endpoint
+# Delete Project File Endpoint
 
 ## Overview
 
-This endpoint allows users to delete a specific template collection.
+This endpoint allows users to delete a specific file resource from a project.
 
 ## Request Details
 
@@ -12,14 +12,15 @@ DELETE
 
 ### Route
 
-`/api/users/[user_id]/collections/[uuid]`
+`/api/users/[user_id]/projects/[project_id]/resources/files/[context_file_id]`
 
 ### Route Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------- | -------- | ------------------------------------------------ |
-| user_id   | integer | Yes      | The ID of the authenticated user                 |
-| uuid      | string  | Yes      | The unique identifier of the template collection |
+| Parameter       | Type    | Required | Description                      |
+| --------------- | ------- | -------- | -------------------------------- |
+| user_id         | integer | Yes      | The ID of the authenticated user |
+| project_id      | integer | Yes      | The ID of the project            |
+| context_file_id | integer | Yes      | The ID of the file to delete     |
 
 ### Headers
 
@@ -32,52 +33,30 @@ DELETE
 
 No query parameters required.
 
-### Request Body
-
-No request body required.
-
 ## Response Format
 
 ### Response Status Codes
 
 | Status Code | Description                               |
 | ----------- | ----------------------------------------- |
-| 200         | Successfully deleted collection           |
+| 204         | Successfully deleted file                 |
+| 400         | Bad request (invalid parameters)          |
 | 401         | Unauthorized (invalid or missing session) |
 | 403         | Forbidden (user_id mismatch)              |
-| 404         | Collection not found                      |
+| 404         | File not found                            |
 | 500         | Server error                              |
 
-### Success Response (200 OK)
+### Success Response (204 No Content)
 
-Returns `true` on successful deletion.
-
-```json
-true
-```
+No response body.
 
 ### Error Response (404 Not Found)
 
 ```json
 {
   "statusCode": 404,
-  "message": "Collection not found"
+  "message": "File not found"
 }
-```
-
-### TypeScript Interface
-
-```typescript
-type ApiResponse = boolean
-```
-
-### Python Model
-
-```python
-from pydantic import BaseModel
-
-class ApiResponse(BaseModel):
-    success: bool
 ```
 
 ## Code Examples
@@ -85,7 +64,7 @@ class ApiResponse(BaseModel):
 ### cURL Example
 
 ```bash
-curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400-e29b-41d4-a716-446655440000" \
+curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/projects/789/resources/files/123" \
   -H "Accept: application/json" \
   -H "Cookie: neptun-session=your-session-cookie"
 ```
@@ -95,12 +74,13 @@ curl -X DELETE "https://neptun-webui.vercel.app/api/users/1/collections/550e8400
 ```python
 import httpx
 
-async def delete_user_collection(
+async def delete_project_file(
     user_id: int,
-    collection_uuid: str,
+    project_id: int,
+    context_file_id: int,
     session_cookie: str
-) -> bool:
-    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/collections/{collection_uuid}"
+) -> None:
+    url = f"https://neptun-webui.vercel.app/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}"
 
     async with httpx.AsyncClient() as client:
         response = await client.delete(
@@ -111,19 +91,19 @@ async def delete_user_collection(
             }
         )
         response.raise_for_status()
-        return response.json()
 ```
 
 ### TypeScript/JavaScript Example
 
 ```typescript
-async function deleteUserCollection(
+async function deleteProjectFile(
   userId: number,
-  collectionUuid: string,
+  projectId: number,
+  contextFileId: number,
   sessionCookie: string
-): Promise<boolean> {
+): Promise<void> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/users/${userId}/collections/${collectionUuid}`,
+    `https://neptun-webui.vercel.app/api/users/${userId}/projects/${projectId}/resources/files/${contextFileId}`,
     {
       method: 'DELETE',
       headers: {
@@ -136,14 +116,14 @@ async function deleteUserCollection(
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-
-  return await response.json()
 }
 ```
 
 ## Notes
 
 - The session cookie is required for authentication
-- The collection must belong to the specified user
-- All templates within the collection will also be deleted
-- This operation cannot be undone
+- The project and file must belong to the specified user
+- All associated file data will be permanently deleted
+- This action cannot be undone
+- All IDs must be valid positive integers
+- File content and metadata will be permanently removed from storage
