@@ -1,8 +1,8 @@
-# Huggingface Chat Endpoint
+# OpenRouter Chat Endpoint
 
 ## Overview
 
-This endpoint provides access to Huggingface's AI models for chat completion with streaming responses.
+This endpoint provides access to OpenRouter's AI models for chat completion with streaming responses.
 
 ## Request Details
 
@@ -12,14 +12,13 @@ POST
 
 ### Route
 
-`/api/ai/huggingface/[model_publisher]/[model_name]/chat`
+`/api/ai/openrouter/[model_name]/chat`
 
 ### Route Parameters
 
-| Parameter       | Type   | Required | Description                   |
-| --------------- | ------ | -------- | ----------------------------- |
-| model_publisher | string | Yes      | The publisher of the AI model |
-| model_name      | string | Yes      | The name of the AI model      |
+| Parameter  | Type   | Required | Description              |
+| ---------- | ------ | -------- | ------------------------ |
+| model_name | string | Yes      | The name of the AI model |
 
 ### Query Parameters
 
@@ -72,7 +71,7 @@ The response is a streaming text response containing the AI model's reply.
 ```json
 {
   "statusCode": 400,
-  "statusMessage": "Invalid model name or publisher"
+  "statusMessage": "Invalid model name"
 }
 ```
 
@@ -118,11 +117,6 @@ interface ModelConfiguration {
   configuration: (inputs: string) => {
     inputs: string
     model: string
-    max_new_tokens?: number
-    typical_p?: number
-    repetition_penalty?: number
-    truncate?: number
-    return_full_text?: boolean
     parameters: {
       max_new_tokens: number
       typical_p: number
@@ -133,43 +127,31 @@ interface ModelConfiguration {
   }
 }
 
-enum AllowedAiModelPublishersEnum {
-  Qwen = 'qwen',
-  DeepSeek = 'deepseek-ai',
-  Mistral = 'mistralai',
-  Google = 'google',
-  Microsoft = 'microsoft'
+enum AllowedOpenRouterPublishersEnum {
+  OpenRouter = 'openrouter'
 }
 
-enum AllowedAiModelNamesEnum {
-  Qwen72B = 'Qwen2.5-72B-Instruct',
-  QwenCoder = 'Qwen2.5-Coder-32B-Instruct',
-  DeepSeekR1 = 'DeepSeek-R1-Distill-Qwen-32B',
-  MistralNemo = 'Mistral-Nemo-Instruct-2407',
-  Mistral7B = 'Mistral-7B-Instruct-v0.3',
-  Gemma = 'gemma-2-27b-it',
-  Phi3 = 'Phi-3-mini-4k-instruct'
+enum AllowedOpenRouterModelNamesEnum {
+  OpenRouterGemini = 'gemini-2.0-pro-exp-02-05',
+  OpenRouterDeepseek = 'deepseek-chat',
+  OpenRouterLlama33 = 'llama-3.3-70b-instruct'
 }
 
-enum AllowedAiModelsEnum {
-  Qwen72B = 'qwen/Qwen2.5-72B-Instruct',
-  QwenCoder = 'qwen/Qwen2.5-Coder-32B-Instruct',
-  DeepSeekR1 = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-  MistralNemo = 'mistralai/Mistral-Nemo-Instruct-2407',
-  Mistral7B = 'mistralai/Mistral-7B-Instruct-v0.3',
-  Gemma = 'google/gemma-2-27b-it',
-  Phi3 = 'microsoft/Phi-3-mini-4k-instruct'
+enum AllowedOpenRouterModelsEnum {
+  OpenRouterGemini = 'openrouter/gemini-2.0-pro-exp-02-05',
+  OpenRouterDeepseek = 'openrouter/deepseek-chat',
+  OpenRouterLlama33 = 'openrouter/llama-3.3-70b-instruct'
 }
 
-type AllowedAiModels = `${AllowedAiModelsEnum}`
-type AllowedAiModelPaths = `/api/ai/huggingface/${AllowedAiModels}/chat`
+type AllowedOpenRouterModels = `${AllowedOpenRouterModelsEnum}`
+type AllowedOpenRouterModelPaths = `/api/ai/openrouter/${AllowedOpenRouterModelNamesEnum}/chat`
 ```
 
 ### Python Model
 
 ```python
 from pydantic import BaseModel
-from typing import List, Literal, Optional, Dict, Union
+from typing import List, Literal, Optional
 from enum import Enum
 
 class Message(BaseModel):
@@ -195,37 +177,20 @@ class ModelConfiguration(BaseModel):
     type: Literal['instruct', 'chat']
     inputs: str
     model: str
-    max_new_tokens: Optional[int] = None
-    typical_p: Optional[float] = None
-    repetition_penalty: Optional[float] = None
-    truncate: Optional[int] = None
-    return_full_text: Optional[bool] = None
     parameters: ModelParameters
 
-class AllowedAiModelPublishers(str, Enum):
-    Qwen = 'qwen'
-    DeepSeek = 'deepseek-ai'
-    Mistral = 'mistralai'
-    Google = 'google'
-    Microsoft = 'microsoft'
+class AllowedOpenRouterPublishers(str, Enum):
+    OpenRouter = 'openrouter'
 
-class AllowedAiModelNames(str, Enum):
-    Qwen72B = 'Qwen2.5-72B-Instruct'
-    QwenCoder = 'Qwen2.5-Coder-32B-Instruct'
-    DeepSeekR1 = 'DeepSeek-R1-Distill-Qwen-32B'
-    MistralNemo = 'Mistral-Nemo-Instruct-2407'
-    Mistral7B = 'Mistral-7B-Instruct-v0.3'
-    Gemma = 'gemma-2-27b-it'
-    Phi3 = 'Phi-3-mini-4k-instruct'
+class AllowedOpenRouterModelNames(str, Enum):
+    OpenRouterGemini = 'gemini-2.0-pro-exp-02-05'
+    OpenRouterDeepseek = 'deepseek-chat'
+    OpenRouterLlama33 = 'llama-3.3-70b-instruct'
 
-class AllowedAiModels(str, Enum):
-    Qwen72B = 'qwen/Qwen2.5-72B-Instruct'
-    QwenCoder = 'qwen/Qwen2.5-Coder-32B-Instruct'
-    DeepSeekR1 = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B'
-    MistralNemo = 'mistralai/Mistral-Nemo-Instruct-2407'
-    Mistral7B = 'mistralai/Mistral-7B-Instruct-v0.3'
-    Gemma = 'google/gemma-2-27b-it'
-    Phi3 = 'microsoft/Phi-3-mini-4k-instruct'
+class AllowedOpenRouterModels(str, Enum):
+    OpenRouterGemini = 'openrouter/gemini-2.0-pro-exp-02-05'
+    OpenRouterDeepseek = 'openrouter/deepseek-chat'
+    OpenRouterLlama33 = 'openrouter/llama-3.3-70b-instruct'
 ```
 
 ## Code Examples
@@ -233,7 +198,7 @@ class AllowedAiModels(str, Enum):
 ### cURL Example
 
 ```bash
-curl -X POST "https://neptun-webui.vercel.app/api/ai/huggingface/meta/llama/chat?chat_id=123" \
+curl -X POST "https://neptun-webui.vercel.app/api/ai/openrouter/gemini-2.0-pro-exp-02-05/chat?chat_id=123" \
   -H "Cookie: neptun-session=your-session-cookie" \
   -H "Content-Type: application/json" \
   -d '{
@@ -261,13 +226,12 @@ class ChatRequest(BaseModel):
 async def stream_chat_completion(
     session_cookie: str,
     chat_id: int,
-    model_publisher: str,
     model_name: str,
     messages: List[Message]
 ) -> None:
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"https://neptun-webui.vercel.app/api/ai/huggingface/{model_publisher}/{model_name}/chat",
+            f"https://neptun-webui.vercel.app/api/ai/openrouter/{model_name}/chat",
             params={"chat_id": chat_id},
             cookies={"neptun-session": session_cookie},
             headers={
@@ -288,12 +252,11 @@ async def stream_chat_completion(
 async function streamChatCompletion(
   sessionCookie: string,
   chatId: number,
-  modelPublisher: string,
   modelName: string,
   messages: Message[]
 ): Promise<void> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/ai/huggingface/${modelPublisher}/${modelName}/chat?chat_id=${chatId}`,
+    `https://neptun-webui.vercel.app/api/ai/openrouter/${modelName}/chat?chat_id=${chatId}`,
     {
       method: 'POST',
       headers: {
@@ -331,4 +294,8 @@ async function streamChatCompletion(
 - Authentication is required via the neptun-session cookie
 - The chat_id must be a valid integer corresponding to an existing chat
 - The response is streamed in chunks as the AI model generates the reply
-- Both model_publisher and model_name must be valid and available
+- Available models through this endpoint:
+  - Gemini 2.0 Pro Experimental
+  - DeepSeek Chat
+  - Llama 3.3 70B Instruct
+- Model configurations are handled by OpenRouter's API
