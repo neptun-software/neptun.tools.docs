@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["cloudflare", "huggingface", "openrouter", "Zoomable"]
+  "cSpell.words": [
+    "cloudflare",
+    "huggingface",
+    "neptun",
+    "ollama",
+    "openrouter",
+    "Zoomable"
+  ]
 }

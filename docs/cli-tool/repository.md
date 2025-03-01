@@ -2,6 +2,7 @@
 sidebar_position: 1
 ---
 
-# Repository
+# Repositories
 
-[neptun.cli](https://github.com/neptun-software/neptun.cli)
+[GitHub](https://github.com/neptun-software/neptun.cli)  
+[PyPi](https://pypi.org/project/neptun)
