@@ -137,8 +137,10 @@ const config = {
         sourceBaseUrl:
           "https://raw.githubusercontent.com/neptun-software/neptun.web/refs/heads/main/public/docs",
         documents: [
+          "api-ai-{model_publisher}-{model_name}-chat.post.md",
           "api-ai-cloudflare-{model_name}-chat.post.md",
           "api-ai-huggingface-{model_publisher}-{model_name}-chat.post.md",
+          "api-ai-ollama-{model_name}-chat.post.md",
           "api-ai-openrouter-{model_name}-chat.post.md",
           "api-auth-check.head.md",
           "api-auth-login.post.md",

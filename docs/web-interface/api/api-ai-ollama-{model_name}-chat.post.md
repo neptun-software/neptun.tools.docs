@@ -1,8 +1,8 @@
-# Cloudflare Chat Endpoint
+# Ollama Chat Endpoint
 
 ## Overview
 
-This endpoint provides access to Cloudflare's AI models for chat completion with streaming responses.
+This endpoint provides access to Ollama's AI models for chat completion with streaming responses.
 
 ## Request Details
 
@@ -12,7 +12,7 @@ POST
 
 ### Route
 
-`/api/ai/cloudflare/[model_name]/chat`
+`/api/ai/ollama/[model_name]/chat`
 
 ### Route Parameters
 
@@ -129,20 +129,20 @@ interface ModelConfiguration {
   }
 }
 
-enum AllowedCloudflarePublishersEnum {
-  Cloudflare = 'cloudflare'
+enum AllowedOllamaPublishersEnum {
+  Ollama = 'ollama'
 }
 
-enum AllowedCloudflareModelNamesEnum {
-  CloudflareLlama = 'llama-3.3-70b-instruct-fp8-fast'
+enum AllowedOllamaModelNamesEnum {
+  RwkvWorld = 'rwkv-6-world'
 }
 
-enum AllowedCloudflareModelsEnum {
-  CloudflareLlama = 'cloudflare/llama-3.3-70b-instruct-fp8-fast'
+enum AllowedOllamaModelsEnum {
+  RwkvWorld = 'ollama/rwkv-6-world'
 }
 
-type AllowedCloudflareModels = `${AllowedCloudflareModelsEnum}`
-type AllowedCloudflareModelPaths = `/api/ai/cloudflare/${AllowedCloudflareModelNamesEnum}/chat`
+type AllowedOllamaModels = `${AllowedOllamaModelsEnum}`
+type AllowedOllamaModelPaths = `/api/ai/ollama/${AllowedOllamaModelNamesEnum}/chat`
 ```
 
 ### Python Model
@@ -180,14 +180,14 @@ class ModelConfiguration(BaseModel):
     type: Literal['instruct', 'chat']
     configuration: ModelConfigurationData
 
-class AllowedCloudflarePublishers(str, Enum):
-    Cloudflare = 'cloudflare'
+class AllowedOllamaPublishers(str, Enum):
+    Ollama = 'ollama'
 
-class AllowedCloudflareModelNames(str, Enum):
-    CloudflareLlama = 'llama-3.3-70b-instruct-fp8-fast'
+class AllowedOllamaModelNames(str, Enum):
+    RwkvWorld = 'rwkv-6-world'
 
-class AllowedCloudflareModels(str, Enum):
-    CloudflareLlama = 'cloudflare/llama-3.3-70b-instruct-fp8-fast'
+class AllowedOllamaModels(str, Enum):
+    RwkvWorld = 'ollama/rwkv-6-world'
 ```
 
 ## Code Examples
@@ -195,7 +195,7 @@ class AllowedCloudflareModels(str, Enum):
 ### cURL Example
 
 ```bash
-curl -X POST "https://neptun-webui.vercel.app/api/ai/cloudflare/llama-3.3-70b-instruct-fp8-fast/chat?chat_id=123" \
+curl -X POST "https://neptun-webui.vercel.app/api/ai/ollama/rwkv-6-world/chat?chat_id=123" \
   -H "Cookie: neptun-session=your-session-cookie" \
   -H "Content-Type: application/json" \
   -d '{
@@ -228,7 +228,7 @@ async def stream_chat_completion(
 ) -> None:
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"https://neptun-webui.vercel.app/api/ai/cloudflare/{model_name}/chat",
+            f"https://neptun-webui.vercel.app/api/ai/ollama/{model_name}/chat",
             params={"chat_id": chat_id},
             cookies={"neptun-session": session_cookie},
             headers={
@@ -253,7 +253,7 @@ async function streamChatCompletion(
   messages: Message[]
 ): Promise<void> {
   const response = await fetch(
-    `https://neptun-webui.vercel.app/api/ai/cloudflare/${modelName}/chat?chat_id=${chatId}`,
+    `https://neptun-webui.vercel.app/api/ai/ollama/${modelName}/chat?chat_id=${chatId}`,
     {
       method: 'POST',
       headers: {
@@ -291,4 +291,6 @@ async function streamChatCompletion(
 - Authentication is required via the neptun-session cookie
 - The chat_id must be a valid integer corresponding to an existing chat
 - The response is streamed in chunks as the AI model generates the reply
-- Only the specified Cloudflare model is available through this endpoint
+- Available models through this endpoint:
+  - RWKV-6-World 1.6B
+- Model configurations are handled by Ollama's API
