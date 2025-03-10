@@ -3,7 +3,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.6
+-- Dumped from database version 16.8
 -- Dumped by pg_dump version 16.6
 
 SET statement_timeout = 0;
@@ -36,25 +36,18 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 --
 
 CREATE TYPE public.ai_model_enum AS ENUM (
+    'google/gemma-2-27b-it',
     'qwen/Qwen2.5-72B-Instruct',
     'qwen/Qwen2.5-Coder-32B-Instruct',
     'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-    'meta-llama/Llama-3.3-70B-Instruct',
     'mistralai/Mistral-Nemo-Instruct-2407',
     'mistralai/Mistral-7B-Instruct-v0.3',
     'microsoft/Phi-3-mini-4k-instruct',
-    'google/gemma-2-27b-it'
-);
-
-
---
--- Name: ai_model_enum_old; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.ai_model_enum_old AS ENUM (
-    'OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
-    'mistralai/Mistral-7B-Instruct-v0.1',
-    'meta-llama/Meta-Llama-3-8B-Instruct'
+    'cloudflare/llama-3.3-70b-instruct-fp8-fast',
+    'openrouter/gemini-2.0-pro-exp-02-05',
+    'openrouter/deepseek-chat',
+    'openrouter/llama-3.3-70b-instruct',
+    'ollama/rwkv-6-world'
 );
 
 
@@ -155,7 +148,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.chat_conversation (
     id integer NOT NULL,
     name text NOT NULL,
-    model text NOT NULL,
+    model public.ai_model_enum NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     neptun_user_id integer NOT NULL
@@ -333,7 +326,8 @@ CREATE TABLE public.github_app_installation (
     github_account_name text,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
-    neptun_user_id integer NOT NULL
+    neptun_user_id integer NOT NULL,
+    github_installation_id integer NOT NULL
 );
 
 
@@ -602,7 +596,8 @@ CREATE TABLE public.neptun_user_project (
     main_language public.programming_language NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
-    neptun_user_id integer NOT NULL
+    neptun_user_id integer NOT NULL,
+    prompt_context jsonb
 );
 
 
@@ -696,6 +691,55 @@ CREATE SEQUENCE public.neptun_user_template_id_seq
 --
 
 ALTER SEQUENCE public.neptun_user_template_id_seq OWNED BY public.neptun_user_template.id;
+
+
+--
+-- Name: neptun_user_webauthn_credential; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.neptun_user_webauthn_credential (
+    id text NOT NULL,
+    public_key text NOT NULL,
+    counter integer DEFAULT 0 NOT NULL,
+    backed_up boolean DEFAULT false NOT NULL,
+    transports json NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    neptun_user_id integer NOT NULL
+);
+
+
+--
+-- Name: neptun_webauthn_challenge; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.neptun_webauthn_challenge (
+    id integer NOT NULL,
+    attempt_id text NOT NULL,
+    challenge text NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    expires_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: neptun_webauthn_challenge_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.neptun_webauthn_challenge_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: neptun_webauthn_challenge_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.neptun_webauthn_challenge_id_seq OWNED BY public.neptun_webauthn_challenge.id;
 
 
 --
@@ -845,6 +889,13 @@ ALTER TABLE ONLY public.neptun_user_template ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.neptun_user_template_collection ALTER COLUMN id SET DEFAULT nextval('public.neptun_user_template_collection_id_seq'::regclass);
+
+
+--
+-- Name: neptun_webauthn_challenge id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_webauthn_challenge ALTER COLUMN id SET DEFAULT nextval('public.neptun_webauthn_challenge_id_seq'::regclass);
 
 
 --
@@ -1000,11 +1051,67 @@ ALTER TABLE ONLY public.neptun_user_template
 
 
 --
+-- Name: neptun_user_webauthn_credential neptun_user_webauthn_credential_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_user_webauthn_credential
+    ADD CONSTRAINT neptun_user_webauthn_credential_id_unique UNIQUE (id);
+
+
+--
+-- Name: neptun_webauthn_challenge neptun_webauthn_challenge_attempt_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_webauthn_challenge
+    ADD CONSTRAINT neptun_webauthn_challenge_attempt_id_unique UNIQUE (attempt_id);
+
+
+--
+-- Name: neptun_webauthn_challenge neptun_webauthn_challenge_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_webauthn_challenge
+    ADD CONSTRAINT neptun_webauthn_challenge_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: chat_conversation_file chat_conversation_file_chat_conversation_id_chat_conversation_i; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_file
+    ADD CONSTRAINT chat_conversation_file_chat_conversation_id_chat_conversation_i FOREIGN KEY (chat_conversation_id) REFERENCES public.chat_conversation(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_conversation_file chat_conversation_file_chat_conversation_message_id_chat_conver; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_file
+    ADD CONSTRAINT chat_conversation_file_chat_conversation_message_id_chat_conver FOREIGN KEY (chat_conversation_message_id) REFERENCES public.chat_conversation_message(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_conversation_file chat_conversation_file_neptun_user_file_id_neptun_user_file_id_; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_file
+    ADD CONSTRAINT chat_conversation_file_neptun_user_file_id_neptun_user_file_id_ FOREIGN KEY (neptun_user_file_id) REFERENCES public.neptun_user_file(id) ON DELETE CASCADE;
+
+
+--
 -- Name: chat_conversation_file chat_conversation_file_neptun_user_id_neptun_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.chat_conversation_file
     ADD CONSTRAINT chat_conversation_file_neptun_user_id_neptun_user_id_fk FOREIGN KEY (neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_conversation_message chat_conversation_message_chat_conversation_id_chat_conversatio; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_message
+    ADD CONSTRAINT chat_conversation_message_chat_conversation_id_chat_conversatio FOREIGN KEY (chat_conversation_id) REFERENCES public.chat_conversation(id) ON DELETE CASCADE;
 
 
 --
@@ -1024,11 +1131,43 @@ ALTER TABLE ONLY public.chat_conversation
 
 
 --
+-- Name: chat_conversation_share chat_conversation_share_chat_conversation_id_chat_conversation_; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_share
+    ADD CONSTRAINT chat_conversation_share_chat_conversation_id_chat_conversation_ FOREIGN KEY (chat_conversation_id) REFERENCES public.chat_conversation(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_conversation_share_whitelist_entry chat_conversation_share_whitelist_entry_chat_conversation_share; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_share_whitelist_entry
+    ADD CONSTRAINT chat_conversation_share_whitelist_entry_chat_conversation_share FOREIGN KEY (chat_conversation_share_id) REFERENCES public.chat_conversation_share(id) ON DELETE CASCADE;
+
+
+--
+-- Name: chat_conversation_share_whitelist_entry chat_conversation_share_whitelist_entry_whitelisted_neptun_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.chat_conversation_share_whitelist_entry
+    ADD CONSTRAINT chat_conversation_share_whitelist_entry_whitelisted_neptun_user FOREIGN KEY (whitelisted_neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
 -- Name: github_app_installation github_app_installation_neptun_user_id_neptun_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.github_app_installation
     ADD CONSTRAINT github_app_installation_neptun_user_id_neptun_user_id_fk FOREIGN KEY (neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
+-- Name: github_app_installation_repository github_app_installation_repository_github_app_installation_id_g; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.github_app_installation_repository
+    ADD CONSTRAINT github_app_installation_repository_github_app_installation_id_g FOREIGN KEY (github_app_installation_id) REFERENCES public.github_app_installation(id) ON DELETE CASCADE;
 
 
 --
@@ -1096,11 +1235,27 @@ ALTER TABLE ONLY public.neptun_user_project
 
 
 --
+-- Name: neptun_user_template_collection neptun_user_template_collection_neptun_user_id_neptun_user_id_f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_user_template_collection
+    ADD CONSTRAINT neptun_user_template_collection_neptun_user_id_neptun_user_id_f FOREIGN KEY (neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
 -- Name: neptun_user_template neptun_user_template_neptun_user_id_neptun_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.neptun_user_template
     ADD CONSTRAINT neptun_user_template_neptun_user_id_neptun_user_id_fk FOREIGN KEY (neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
+-- Name: neptun_user_template neptun_user_template_template_collection_id_neptun_user_templat; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_user_template
+    ADD CONSTRAINT neptun_user_template_template_collection_id_neptun_user_templat FOREIGN KEY (template_collection_id) REFERENCES public.neptun_user_template_collection(id) ON DELETE CASCADE;
 
 
 --
@@ -1112,11 +1267,59 @@ ALTER TABLE ONLY public.neptun_user_template
 
 
 --
+-- Name: neptun_user_webauthn_credential neptun_user_webauthn_credential_neptun_user_id_neptun_user_id_f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.neptun_user_webauthn_credential
+    ADD CONSTRAINT neptun_user_webauthn_credential_neptun_user_id_neptun_user_id_f FOREIGN KEY (neptun_user_id) REFERENCES public.neptun_user(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_chat_conversation project_chat_conversation_chat_conversation_id_chat_conversatio; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_chat_conversation
+    ADD CONSTRAINT project_chat_conversation_chat_conversation_id_chat_conversatio FOREIGN KEY (chat_conversation_id) REFERENCES public.chat_conversation(id) ON DELETE CASCADE;
+
+
+--
 -- Name: project_chat_conversation project_chat_conversation_project_id_neptun_user_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project_chat_conversation
     ADD CONSTRAINT project_chat_conversation_project_id_neptun_user_project_id_fk FOREIGN KEY (project_id) REFERENCES public.neptun_user_project(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_github_installation project_github_installation_github_installation_id_github_app_i; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_github_installation
+    ADD CONSTRAINT project_github_installation_github_installation_id_github_app_i FOREIGN KEY (github_installation_id) REFERENCES public.github_app_installation(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_github_installation project_github_installation_project_id_neptun_user_project_id_f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_github_installation
+    ADD CONSTRAINT project_github_installation_project_id_neptun_user_project_id_f FOREIGN KEY (project_id) REFERENCES public.neptun_user_project(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_template_collection project_template_collection_project_id_neptun_user_project_id_f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_template_collection
+    ADD CONSTRAINT project_template_collection_project_id_neptun_user_project_id_f FOREIGN KEY (project_id) REFERENCES public.neptun_user_project(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_template_collection project_template_collection_template_collection_id_neptun_user_; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_template_collection
+    ADD CONSTRAINT project_template_collection_template_collection_id_neptun_user_ FOREIGN KEY (template_collection_id) REFERENCES public.neptun_user_template_collection(id) ON DELETE CASCADE;
 
 
 --

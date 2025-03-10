@@ -4,7 +4,7 @@ erDiagram
     chat_conversation {
         id integer_NOT_NULL
         name text_NOT_NULL
-        model text_NOT_NULL
+        model ai_model_enum_NOT_NULL
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
@@ -53,6 +53,7 @@ erDiagram
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
+        github_installation_id integer_NOT_NULL
     }
     github_app_installation_repository {
         id integer_NOT_NULL
@@ -140,6 +141,7 @@ erDiagram
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
+        prompt_context jsonb
     }
     neptun_user_template {
         id integer_NOT_NULL
@@ -160,6 +162,23 @@ erDiagram
         created_at timestamp_without_time_zone
         updated_at timestamp_without_time_zone
         neptun_user_id integer_NOT_NULL
+    }
+    neptun_user_webauthn_credential {
+        id text_NOT_NULL
+        public_key text_NOT_NULL
+        counter integer_NOT_NULL
+        backed_up boolean_NOT_NULL
+        transports json_NOT_NULL
+        created_at timestamp_without_time_zone
+        updated_at timestamp_without_time_zone
+        neptun_user_id integer_NOT_NULL
+    }
+    neptun_webauthn_challenge {
+        id integer_NOT_NULL
+        attempt_id text_NOT_NULL
+        challenge text_NOT_NULL
+        created_at timestamp_without_time_zone
+        expires_at timestamp_without_time_zone_NOT_NULL
     }
     project_chat_conversation {
         project_id integer_NOT_NULL
@@ -192,6 +211,7 @@ erDiagram
     chat_conversation_message }o--|| chat_conversation : "references"
     chat_conversation_share }o--|| chat_conversation : "references"
     chat_conversation_share_whitelist_entry }o--|| chat_conversation_share : "references"
+    chat_conversation_share_whitelist_entry }o--|| neptun_user : "references"
     github_app_installation }o--|| neptun_user : "references"
     github_app_installation_repository }o--|| github_app_installation : "references"
     neptun_context_file }o--|| neptun_user : "references"
@@ -203,15 +223,16 @@ erDiagram
     neptun_user_oauth_account }o--|| neptun_user : "references"
     neptun_user_project }o--|| neptun_user : "references"
     neptun_user_template }o--|| neptun_user : "references"
-    neptun_user_template }o--|| neptun_user_file : "references"
     neptun_user_template }o--|| neptun_user_template_collection : "references"
+    neptun_user_template }o--|| neptun_user_file : "references"
     neptun_user_template_collection }o--|| neptun_user : "references"
+    neptun_user_webauthn_credential }o--|| neptun_user : "references"
     project_chat_conversation }o--|| chat_conversation : "references"
     project_chat_conversation }o--|| neptun_user_project : "references"
     project_github_installation }o--|| github_app_installation : "references"
     project_github_installation }o--|| neptun_user_project : "references"
-    project_template_collection }o--|| neptun_user_template_collection : "references"
     project_template_collection }o--|| neptun_user_project : "references"
+    project_template_collection }o--|| neptun_user_template_collection : "references"
     project_user_file }o--|| neptun_user_project : "references"
     project_user_file }o--|| neptun_user_file : "references"
 ```
