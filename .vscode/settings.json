@@ -1,7 +1,11 @@
 {
   "cSpell.words": [
     "cloudflare",
+    "FIRECRAWL",
     "huggingface",
+    "llms",
+    "llmsfulltxt",
+    "llmstxt",
     "neptun",
     "ollama",
     "openrouter",
