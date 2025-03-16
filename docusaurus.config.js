@@ -182,6 +182,9 @@ const config = {
           "api-users-{user_id}-projects-{project_id}.get.md",
           "api-users-{user_id}-projects-{project_id}.patch.md",
           "api-users-{user_id}-projects-{project_id}-chats.get.md",
+          "api-users-{user_id}-projects-{project_id}-context.get.md",
+          "api-users-{user_id}-projects-{project_id}-context.post.md",
+          "api-users-{user_id}-projects-{project_id}-context-markdown.get.md",
           "api-users-{user_id}-projects-{project_id}-resources-{resource_type}.get.md",
           "api-users-{user_id}-projects-{project_id}-resources-{resource_type}.post.md",
           "api-users-{user_id}-projects-{project_id}-resources-{resource_type}-{resource_id}.delete.md",
@@ -198,6 +201,8 @@ const config = {
           "email-{email}-reset-password.post.md",
           "health.get.md",
           "models.get.md",
+          "api-github-accounts-{github_account_name}-repositories-{github_repository_name}-configuration-files.get.md",
+          "api-github-app-accounts-{github_account_id}-repositories-{github_repository_id}-configuration-files.get.md",
         ],
         outDir: "docs/web-interface/api",
         modifyContent(_filename, content) {

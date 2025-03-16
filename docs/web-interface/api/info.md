@@ -84,6 +84,17 @@
 - `PUT` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](./api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.put.md)
 - `DELETE` [`/api/users/{user_id}/projects/{project_id}/resources/files/{context_file_id}`](./api-users-{user_id}-projects-{project_id}-resources-files-{context_file_id}.delete.md)
 
+### GitHub Routes
+
+- `GET` [`/api/github/accounts/{github_account_name}/repositories/{github_repository_name}/configuration-files`](./api-github-accounts-{github_account_name}-repositories-{github_repository_name}-configuration-files.get.md)
+- `GET` [`/api/github/app/accounts/{github_account_id}/repositories/{github_repository_id}/configuration-files`](./api-github-app-accounts-{github_account_id}-repositories-{github_repository_id}-configuration-files.get.md)
+
+### Project Context Routes
+
+- `GET` [`/api/users/{user_id}/projects/{project_id}/context`](./api-users-{user_id}-projects-{project_id}-context.get.md)
+- `POST` [`/api/users/{user_id}/projects/{project_id}/context`](./api-users-{user_id}-projects-{project_id}-context.post.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/context/markdown`](./api-users-{user_id}-projects-{project_id}-context-markdown.get.md)
+
 ### Model Routes
 
 - `GET` [`/models`](./models.get.md)
