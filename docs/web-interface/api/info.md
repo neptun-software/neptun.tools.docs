@@ -89,6 +89,7 @@
 
 - `GET` [`/api/github/accounts/{github_account_name}/repositories/{github_repository_name}/configuration-files`](./api-github-accounts-{github_account_name}-repositories-{github_repository_name}-configuration-files.get.md)
 - `GET` [`/api/github/app/accounts/{github_account_id}/repositories/{github_repository_id}/configuration-files`](./api-github-app-accounts-{github_account_id}-repositories-{github_repository_id}-configuration-files.get.md)
+- `GET` [`/api/users/{user_id}/projects/{project_id}/resources/github-repositories`](./api-users-{user_id}-projects-{project_id}-resources-github-repositories.get.md)
 
 ### Project Context Routes
 
